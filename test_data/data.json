@@ -1,0 +1,29 @@
+[
+    {
+        "encryptedText": "U2FsdGVkX1+L+0B1j7Yw5T5wWg==",
+        "createdAt": "2024-09-21T12:00:00Z",
+        "expiresAt": "2024-09-28T12:00:00Z",
+        "isDeleted": false,
+        "password": "mypassword123",
+        "views": 0,
+        "customId": "note1"
+    },
+    {
+        "encryptedText": "U2FsdGVkX19Z1aHhB2hndX5vBf==",
+        "createdAt": "2024-09-21T12:00:00Z",
+        "expiresAt": "2024-10-05T12:00:00Z",
+        "isDeleted": false,
+        "password": null,
+        "views": 0,
+        "customId": "note2"
+    },
+    {
+        "encryptedText": "U2FsdGVkX1+abcde12345",
+        "createdAt": "2024-09-21T12:00:00Z",
+        "expiresAt": "2024-10-21T12:00:00Z",
+        "isDeleted": true,
+        "password": "secret",
+        "views": 5,
+        "customId": "note3"
+    }
+]
