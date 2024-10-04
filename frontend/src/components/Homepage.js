@@ -56,7 +56,7 @@ function Homepage() {
             }
 
             const result = await response.json();
-            console.log(result);  // API response data (if needed)
+            console.log(result);
 
             // Proceed with rendering NoteReady on success
             setIsSubmitted(true);

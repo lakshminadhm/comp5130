@@ -8,7 +8,7 @@ const { decrypt } = require('dotenv');
 exports.createNote = async (inputNote) => {
     const salt = generateSalt(); // Generate a unique salt
     const hash = hashNoteContent(inputNote, salt); // Hash the note with the salt
-    console.log(hash)
+    // console.log(hash)
 
     encryptedText = cryptoFunc.encrypt(inputNote.text, hash)    
 
