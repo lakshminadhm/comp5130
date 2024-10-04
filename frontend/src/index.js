@@ -3,10 +3,6 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import Homepage from './components/Homepage';
-import NoteLink from './components/NoteLink/NoteLink';
-import NoteReady from './components/NoteReady/NoteReady';
-import Header from './components/Header/Header';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

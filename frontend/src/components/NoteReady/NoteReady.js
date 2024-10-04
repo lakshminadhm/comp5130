@@ -1,30 +1,37 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Container, Typography, Box, Button, TextField } from '@mui/material';
 
 function NoteReady() {
+  const [copySuccess, setCopySuccess] = useState('');
+
+  const noteLink = "https://privnote.com/ZfM9ZcUW#BIXwSkSNV";
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(noteLink)
+      .then(() => {
+        setCopySuccess('Link copied to clipboard!');
+      })
+      .catch(() => {
+        setCopySuccess('Failed to copy link.');
+      });
+  };
+
+  const handleDestroy = () => {
+    // handle destroy logic
+  }
+
   return (
-    <Container maxWidth="md" style={{ marginTop: '50px' }}>
-      <Box 
-        sx={{ 
-          backgroundColor: '#f5f5f5', 
-          padding: '20px', 
-          borderRadius: '8px', 
-          boxShadow: '0px 4px 12px rgba(0,0,0,0.1)' 
-        }}
-      >
-        {/* Header */}
-        <Typography variant="h4" align="center" style={{ fontWeight: 'bold', marginBottom: '20px' }}>
-          priv<span style={{ color: 'red' }}>note</span>
-        </Typography>
+    <Container >
+      <Box>
 
         {/* Note link */}
         <Typography variant="h6" align="center" gutterBottom>
           Note link ready
         </Typography>
-        
+
         <TextField
           fullWidth
-          value="https://privnote.com/ZfM9ZcUW#BIXwSkSNV"
+          value={noteLink}
           InputProps={{
             readOnly: true,
             style: { backgroundColor: '#ffffcc', padding: '10px' }
@@ -37,24 +44,35 @@ function NoteReady() {
         </Typography>
 
         {/* Buttons */}
-        <Box 
-          sx={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            gap: '10px', 
-            marginTop: '20px' 
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '10px',
+            marginTop: '20px'
           }}
         >
-          <Button variant="contained" color="primary">
-            Select link
+          <Button variant="contained" color="primary" onClick={handleCopyLink}>
+            Copy link
           </Button>
-          <Button variant="contained" color="secondary">
+          <Button
+            variant="contained"
+            color="secondary"
+            href={`mailto:?subject=Secure Note Link&body=Here is the link to your secure note: ${noteLink}`}
+          >
             E-mail link
           </Button>
         </Box>
 
+        {/* Copy Success Message */}
+        {copySuccess && (
+          <Typography variant="body2" color="secondary" sx={{ marginTop: 2, textAlign: 'center' }}>
+            {copySuccess}
+          </Typography>
+        )}
+
         {/* Destroy note button */}
-        <Box sx={{ textAlign: 'center', marginTop: '20px' }}>
+        <Box sx={{ textAlign: 'center', marginTop: '20px' }} onClick={handleDestroy}>
           <Button variant="contained" color="error">
             Destroy note now
           </Button>
