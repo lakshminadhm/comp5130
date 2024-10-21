@@ -4,6 +4,7 @@ import { Container, Typography, Box, Button, CircularProgress, Alert, TextField 
 import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
 import Loading from '../Loading/Loading';
 import NoteDestroyed from '../NoteDestroyed/NoteDestroyed';
+import { getRequest } from '../../services/service';
 
 function ViewNote() {
   const { noteId: urlNoteId } = useParams(); // Extract the noteId from the URL if available
@@ -30,19 +31,20 @@ function ViewNote() {
   }, [urlNoteId]);
 
   // Handler to fetch note details
-  const fetchNoteDetails = (id) => {
+  const fetchNoteDetails = async (id) => {
     setLoading(true);
     setError(null);
-    // Simulate fetching note details with dummy data
-    setTimeout(() => {
-      if (dummyNoteData[id]) {
-        setNote(dummyNoteData[id]);
-      } else {
-        setError('Note not found or already expired');
+
+    const response = await getRequest( '/api/note/'+id, {'Authorization': `Bearer ${localStorage.getItem('token')}`});
+    console.log(response)
+    if(response){
+      setNote(response.text)
+    }
+    else{
+      setError('Note not found or already expired');
         setDestroyed(true);
-      }
-      setLoading(false);
-    }, 1000); // Simulate network delay
+    }
+    setLoading(false);
   };
 
   // Handler for manual note ID input change
@@ -148,7 +150,7 @@ function ViewNote() {
               color: '#333',
             }}
           >
-            {note.content}
+            {note}
           </Box>
 
           {/* Select Text Button */}

@@ -1,5 +1,10 @@
 const noteService = require('../services/noteService');
 
+
+exports.healthCheck = async (req, res) => {
+    res.json(true)
+}
+
 exports.createNote = async (req, res) => {
     try {
         const inputNote = req.body;
@@ -17,7 +22,7 @@ exports.getNoteById = async (req, res) => {
         const note = await noteService.getNoteById(customId);
         if (!note) {
             return res.status(404).json({ message: 'Note not found or deleted' });
-        }        
+        }
         res.json(note); // Return the note
     } catch (error) {
         console.log(error)

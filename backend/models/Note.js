@@ -11,7 +11,7 @@ const NoteSchema = new mongoose.Schema({
   },
   expiresAt: {
     type: Date,
-    required: true,
+    required: false,
   },
   isDeleted: {
     type: Boolean,
@@ -29,7 +29,24 @@ const NoteSchema = new mongoose.Schema({
     type: String,
     unique: true, // Ensure this is unique
     required: true,
-  }
+  },
+  selfDestructTime: {
+    type: String,
+    default: 'After reading it',
+    enum: ['After reading it', '1 hour', '1 day', '1 week'], // You can add more options as needed
+  },
+  confirmBeforeDestruction: {
+    type: Boolean,
+    default: false,
+  },
+  email: {
+    type: String,
+    default: '',
+  },
+  referenceName: {
+    type: String,
+    default: '',
+  },
 });
 
 module.exports = mongoose.model('Note', NoteSchema);

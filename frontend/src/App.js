@@ -1,12 +1,19 @@
-import logo from './logo.svg';
 import './App.css';
 import { Container, Box } from '@mui/material';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Homepage from './components/Homepage/Homepage';
 import CreateNote from './components/CreateNote/CreateNote';
 import ViewNote from './components/ViewNote/ViewNote';
 import Header from './components/Header/Header';
 import NotFound from './components/NotFound/NotFound';
+import LoginForm from './components/LoginForm/LoginForm';
+import RegisterForm from './components/Registration/Registration';
+
+// A component to handle protected routes
+const ProtectedRoute = ({ element }) => {
+  const token = localStorage.getItem('token'); // Check if the user is logged in
+  return token ? element : <Navigate to="/login" />;
+};
 
 function App() {
   return (
@@ -28,17 +35,15 @@ function App() {
           <Header />
 
           <Routes>
-            {/* Homepage Route */}
-            <Route path="/" element={<Homepage />} />
+            {/* Public Routes */}
+            <Route path="/login" element={<LoginForm />} />
+            <Route path="/register" element={<RegisterForm />} />
 
-            {/* Create Note Route */}
-            <Route path="/create" element={<CreateNote />} />
-
-            {/* View Note Route - The noteId is captured as a parameter */}
-            <Route path="/view/:noteId" element={<ViewNote />} />
-
-            {/* Manual Note ID Entry Route - Could use the same ViewNote component */}
-            <Route path="/view" element={<ViewNote />} />
+            {/* Protected Routes */}
+            <Route path="/" element={<ProtectedRoute element={<Homepage />} />} />
+            <Route path="/create" element={<ProtectedRoute element={<CreateNote />} />} />
+            <Route path="/view/:noteId" element={<ProtectedRoute element={<ViewNote />} />} />
+            <Route path="/view" element={<ProtectedRoute element={<ViewNote />} />} />
 
             {/* Catch-all route for undefined paths */}
             <Route path="*" element={<NotFound />} />

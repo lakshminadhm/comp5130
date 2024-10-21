@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { Container, Typography, Box, Button, TextField } from '@mui/material';
 
-function NoteReady() {
+function NoteReady({ noteLink }) {
+  const noteId = "https://localhost:3000/view/"+ noteLink;
   const [copySuccess, setCopySuccess] = useState('');
-
-  const noteLink = "https://privnote.com/ZfM9ZcUW#BIXwSkSNV";
+  console.log(noteId)
+  // const noteLink = "https://privnote.com/ZfM9ZcUW#BIXwSkSNV";
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(noteLink)
+    navigator.clipboard.writeText(noteId)
       .then(() => {
         setCopySuccess('Link copied to clipboard!');
       })
@@ -31,7 +32,7 @@ function NoteReady() {
 
         <TextField
           fullWidth
-          value={noteLink}
+          value={noteId}
           InputProps={{
             readOnly: true,
             style: { backgroundColor: '#ffffcc', padding: '10px' }
@@ -58,7 +59,7 @@ function NoteReady() {
           <Button
             variant="contained"
             color="secondary"
-            href={`mailto:?subject=Secure Note Link&body=Here is the link to your secure note: ${noteLink}`}
+            href={`mailto:?subject=Secure Note Link&body=Here is the link to your secure note: ${noteId}`}
           >
             E-mail link
           </Button>

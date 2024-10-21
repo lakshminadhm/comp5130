@@ -5,6 +5,7 @@ import {
 } from '@mui/material';
 import './CreateNote.css';
 import NoteReady from '../NoteReady/NoteReady';
+import { postRequest } from '../../services/service';
 
 function CreateNote() {
   const [noteText, setNoteText] = useState('');
@@ -15,10 +16,10 @@ function CreateNote() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [email, setEmail] = useState('');
   const [referenceName, setReferenceName] = useState('');
+  const [noteLink, setNoteLink] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
   // Enum-like object for self-destruct times
   const SelfDestructTimes = {
     AFTER_READING: "After reading it",
@@ -55,25 +56,18 @@ function CreateNote() {
 
     try {
       setLoading(true);
-      // Simulate API call
+      // API call
+      console.log(localStorage.getItem('token'))
+      const response = await postRequest('/api/note', formData,{'Authorization': `Bearer ${localStorage.getItem('token')}`});
 
-    //   const response = await fetch('https://api.example.com/notes', { // Replace with actual API endpoint
-    //     method: 'POST',
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify(formData),
-    // });
+      // if (!response.ok) {
+      //     throw new Error('Failed to submit the note. Please try again.');
+      // }
 
-    // if (!response.ok) {
-    //     throw new Error('Failed to submit the note. Please try again.');
-    // }
+      const result = response
 
-    // const result = await response.json();
+      setNoteLink(result.noteId);
 
-
-      const result = "SampleNoteID"; // Replace with actual API call
-      console.log(result);
       setIsSubmitted(true);
     } catch (err) {
       console.error('Error:', err);
@@ -83,122 +77,126 @@ function CreateNote() {
     }
   };
 
-  // Conditionally render NoteReady or the form
-  if (isSubmitted) {
-    return <NoteReady noteText={noteText} />;
-  }
+  // // Conditionally render NoteReady or the form
+  // if (isSubmitted) {
+  //   return <NoteReady noteText={noteLink} />;
+  // }
 
   return (
     <Container maxWidth="md">
       <Box>
-
         {error && (
           <Alert severity="error" sx={{ marginBottom: 2 }}>
             {error}
           </Alert>
         )}
-
+  
         {loading && <Typography>Submitting note...</Typography>}
-
+  
         {!loading && (
-          <form onSubmit={handleSubmit}>
-            <TextField
-              label="Write your note here..."
-              multiline
-              fullWidth
-              rows={4}
-              value={noteText}
-              onChange={handleNoteChange}
-              sx={{ marginBottom: 2 }}
-            />
-
-            <Button type="submit" variant="contained" color="primary" sx={{ marginRight: 2 }}>Create Note</Button>
-            <Button variant="outlined" onClick={() => setShowOptions(!showOptions)}>
-              {showOptions ? "Hide" : "Show"} options
-            </Button>
-
-            {showOptions && (
-              <Box className="options-section" sx={{ marginTop: 2 }}>
-                {/* Self-destruct options */}
-                <Typography variant="h6" sx={{ marginBottom: 2 }}>Self-Destruct Time</Typography>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} md={6}>
-                    <Select
-                      value={selfDestructTime}
-                      onChange={handleSelfDestructChange}
-                      fullWidth
-                    >
-                      {Object.entries(SelfDestructTimes).map(([key, value]) => (
-                        <MenuItem key={key} value={value}>
-                          {value}
-                        </MenuItem>
-                      ))}
-                    </Select>
+          isSubmitted ? (
+            <NoteReady noteLink={noteLink} />  // Conditionally render NoteReady component
+          ) : (
+            <form onSubmit={handleSubmit}>
+              <TextField
+                label="Write your note here..."
+                multiline
+                fullWidth
+                rows={4}
+                value={noteText}
+                onChange={handleNoteChange}
+                sx={{ marginBottom: 2 }}
+              />
+  
+              <Button type="submit" variant="contained" color="primary" sx={{ marginRight: 2 }}>Create Note</Button>
+              <Button variant="outlined" onClick={() => setShowOptions(!showOptions)}>
+                {showOptions ? "Hide" : "Show"} options
+              </Button>
+  
+              {showOptions && (
+                <Box className="options-section" sx={{ marginTop: 2 }}>
+                  {/* Self-destruct options */}
+                  <Typography variant="h6" sx={{ marginBottom: 2 }}>Self-Destruct Time</Typography>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} md={6}>
+                      <Select
+                        value={selfDestructTime}
+                        onChange={handleSelfDestructChange}
+                        fullWidth
+                      >
+                        {Object.entries(SelfDestructTimes).map(([key, value]) => (
+                          <MenuItem key={key} value={value}>
+                            {value}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={confirmBeforeDestruction}
+                            onChange={() => setConfirmBeforeDestruction(!confirmBeforeDestruction)}
+                          />
+                        }
+                        label="Do not ask for confirmation before showing and destroying the note"
+                      />
+                    </Grid>
                   </Grid>
-                  <Grid item xs={12} md={6}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={confirmBeforeDestruction}
-                          onChange={() => setConfirmBeforeDestruction(!confirmBeforeDestruction)}
-                        />
-                      }
-                      label="Do not ask for confirmation before showing and destroying the note"
-                    />
+  
+                  {/* Password Section */}
+                  <Typography variant="h6" sx={{ marginTop: 2 }}>Manual Password</Typography>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} md={6}>
+                      <TextField
+                        label="Enter a custom password"
+                        type="password"
+                        fullWidth
+                        value={password}
+                        onChange={handlePasswordChange}
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <TextField
+                        label="Confirm password"
+                        type="password"
+                        fullWidth
+                        value={confirmPassword}
+                        onChange={handleConfirmPasswordChange}
+                      />
+                    </Grid>
                   </Grid>
-                </Grid>
-
-                {/* Password Section */}
-                <Typography variant="h6" sx={{ marginTop: 2 }}>Manual Password</Typography>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} md={6}>
-                    <TextField
-                      label="Enter a custom password"
-                      type="password"
-                      fullWidth
-                      value={password}
-                      onChange={handlePasswordChange}
-                    />
+  
+                  {/* Destruction Notification Section */}
+                  <Typography variant="h6" sx={{ marginTop: 2 }}>Destruction Notification</Typography>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} md={6}>
+                      <TextField
+                        label="Email to notify when note is destroyed"
+                        type="email"
+                        fullWidth
+                        value={email}
+                        onChange={handleEmailChange}
+                      />
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <TextField
+                        label="Reference name for the note (optional)"
+                        fullWidth
+                        value={referenceName}
+                        onChange={handleReferenceNameChange}
+                      />
+                    </Grid>
                   </Grid>
-                  <Grid item xs={12} md={6}>
-                    <TextField
-                      label="Confirm password"
-                      type="password"
-                      fullWidth
-                      value={confirmPassword}
-                      onChange={handleConfirmPasswordChange}
-                    />
-                  </Grid>
-                </Grid>
-
-                {/* Destruction Notification Section */}
-                <Typography variant="h6" sx={{ marginTop: 2 }}>Destruction Notification</Typography>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} md={6}>
-                    <TextField
-                      label="Email to notify when note is destroyed"
-                      type="email"
-                      fullWidth
-                      value={email}
-                      onChange={handleEmailChange}
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    <TextField
-                      label="Reference name for the note (optional)"
-                      fullWidth
-                      value={referenceName}
-                      onChange={handleReferenceNameChange}
-                    />
-                  </Grid>
-                </Grid>
-              </Box>
-            )}
-          </form>
+                </Box>
+              )}
+            </form>
+          )
         )}
       </Box>
     </Container>
   );
+  
 }
 
 export default CreateNote;
