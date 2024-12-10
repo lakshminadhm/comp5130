@@ -6,6 +6,7 @@ import {
 import './CreateNote.css';
 import NoteReady from '../NoteReady/NoteReady';
 import { postRequest } from '../../services/service';
+import Loading from '../Loading/Loading';
 
 function CreateNote() {
   const [noteText, setNoteText] = useState('');
@@ -40,6 +41,10 @@ function CreateNote() {
     event.preventDefault();
     setError(null); // Reset error before submission
 
+    if(noteText === ''){
+      setError("Note can not be empty.");
+      return;
+    }
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
       return;
@@ -91,7 +96,7 @@ function CreateNote() {
           </Alert>
         )}
   
-        {loading && <Typography>Submitting note...</Typography>}
+        {loading && <Loading progressText={"Submitting Note..."}></Loading>}
   
         {!loading && (
           isSubmitted ? (

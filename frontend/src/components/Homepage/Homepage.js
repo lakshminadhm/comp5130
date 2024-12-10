@@ -20,7 +20,7 @@ const Homepage = () => {
       <Box className="box">
         {/* Welcome Header */}
         <Typography variant="h3" className="welcome-text">
-          Welcome to Privnote Clone!
+          Welcome to Crypto Note !
         </Typography>
         <Typography variant="h6">
           Create self-destructing notes and share them securely with friends.

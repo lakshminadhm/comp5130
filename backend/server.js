@@ -26,12 +26,14 @@ app.use(express.json());
 const notesRouter = require('../backend/routes/routes.js');
 app.use('/api', notesRouter);
 
-// Load SSL certificates for HTTPS
-const key = fs.readFileSync('../certs/key.pem');
-const cert = fs.readFileSync('../certs/cert.pem');
+const options = {
+    // Load SSL certificates for HTTPS
+    key: fs.readFileSync('../certs/cryptonote.key'),
+    cert: fs.readFileSync('../certs/cryptonote.crt'),
+}
 
 // Create HTTPS server
-const httpsServer = https.createServer({ key, cert }, app);
+const httpsServer = https.createServer(options, app);
 
 const PORT = process.env.PORT || 5000;
 

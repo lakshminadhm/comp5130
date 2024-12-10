@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { TextField, Button, Typography, Container, Box } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { TextField, Button, Typography, Container, Box, CircularProgress } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { postRequest } from '../../services/service';
 
@@ -9,6 +9,7 @@ const LoginForm = () => {
     const [error, setError] = useState(null);
     const [validationError, setValidationError] = useState('');  // New state for validation errors
     const navigate = useNavigate();  // useNavigate hook for redirection
+    const [isLoading, setIsLoading] = useState(false);
 
     const validateForm = () => {
         // Email format validation
@@ -30,6 +31,7 @@ const LoginForm = () => {
     };
 
     const handleSubmit = async (e) => {
+        setIsLoading(true);
         e.preventDefault();
         if (!validateForm()) return;  // Return early if validation fails
 
@@ -46,8 +48,18 @@ const LoginForm = () => {
         } catch (error) {
             console.log(error)
             setError('Error logging in, please try again.');
+            setIsLoading(false);
+        } finally{
+            setIsLoading(false);
         }
     };
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            navigate('/'); // Redirect to homepage if token exists
+        }
+    }, [navigate]);
 
     return (
         <Container maxWidth="xs">
@@ -81,8 +93,10 @@ const LoginForm = () => {
                         type="submit"
                         variant="contained"
                         fullWidth
-                        sx={{ mt: 2 }}>
-                        Login
+                        sx={{ mt: 2 }}
+                        disabled={isLoading}>                        
+
+                        {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Login'}
                     </Button>
                 </form>
 

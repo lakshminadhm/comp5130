@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography, Container, Box } from '@mui/material';
+import { TextField, Button, Typography, Container, Box, CircularProgress } from '@mui/material'; // Add CircularProgress for the loading spinner
 import { Link, useNavigate } from 'react-router-dom';
 import { postRequest } from '../../services/service';
 
@@ -8,8 +8,9 @@ const RegisterForm = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
-    const [validationError, setValidationError] = useState('');  // New state for validation errors
-    const navigate = useNavigate();  // useNavigate hook for redirection
+    const [validationError, setValidationError] = useState(''); // New state for validation errors
+    const [isLoading, setIsLoading] = useState(false); // New state for loading
+    const navigate = useNavigate(); // useNavigate hook for redirection
 
     const validateForm = () => {
         // Check if username is non-empty
@@ -38,20 +39,23 @@ const RegisterForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!validateForm()) return;  // Return early if validation fails
+        if (!validateForm()) return; // Return early if validation fails
 
+        setIsLoading(true); // Set loading state to true
         try {
             const request = { "username": username, "email": email, "password": password };
             const response = await postRequest('/api/register', request);
 
             if (response) {
-                localStorage.setItem('token', response.token);  // Automatically log in the user
-                navigate('/');  // Redirect to homepage after registration
+                localStorage.setItem('token', response.token); // Automatically log in the user
+                navigate('/'); // Redirect to homepage after registration
             } else {
                 setError(response.message);
             }
         } catch (error) {
             setError('Error registering, please try again.');
+        } finally {
+            setIsLoading(false); // Set loading state back to false
         }
     };
 
@@ -72,6 +76,7 @@ const RegisterForm = () => {
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         required
+                        disabled={isLoading} // Disable input fields while loading
                     />
                     <TextField
                         label="Email"
@@ -81,6 +86,7 @@ const RegisterForm = () => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
+                        disabled={isLoading} // Disable input fields while loading
                     />
                     <TextField
                         label="Password"
@@ -91,13 +97,16 @@ const RegisterForm = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
+                        disabled={isLoading} // Disable input fields while loading
                     />
                     <Button
                         type="submit"
                         variant="contained"
                         fullWidth
-                        sx={{ mt: 2 }}>
-                        Register
+                        sx={{ mt: 2 }}
+                        disabled={isLoading} // Disable the button while loading
+                    >
+                        {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Register'}
                     </Button>
                 </form>
 

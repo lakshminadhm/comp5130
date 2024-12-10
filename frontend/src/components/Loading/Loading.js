@@ -1,7 +1,7 @@
 import React from 'react';
-import { CircularProgress, Box } from '@mui/material';
+import { CircularProgress, Box, Typography } from '@mui/material';
 
-const Loading = () => {
+const Loading = ({progressText}) => {
   return (
     <Box
       sx={{
@@ -12,6 +12,7 @@ const Loading = () => {
       }}
     >
       <CircularProgress />
+      <Typography marginLeft={3}>{progressText}</Typography>
     </Box>
   );
 };

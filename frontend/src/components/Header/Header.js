@@ -29,10 +29,10 @@ function Header() {
                 {/* Clicking the title navigates to the homepage */}
                 <Box onClick={handleClick} style={{ cursor: 'pointer', textAlign: 'center' }}>
                     <Typography variant="h4" style={{ fontWeight: 'bold' }}>
-                        priv<span style={{ color: 'red' }}>note</span>
+                        crypto<span style={{ color: 'red' }}>Note</span>
                     </Typography>
                     <Typography variant="body2" color="gray">
-                        privnote.com
+                       A place to share your note securely
                     </Typography>
                 </Box>
 
