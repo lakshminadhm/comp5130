@@ -8,7 +8,7 @@ const NoteInputSchema = new mongoose.Schema({
   selfDestructTime: {
     type: String,
     default: 'After reading it',  // Default self-destruction time
-    enum: ['After reading it', '1 hour', '1 day', '1 week'],  // Example options for self-destruction time
+    enum: ['After reading it', '1 Hr','2 Hrs', '1 day', '1 week'],  // Example options for self-destruction time
   },
   confirmBeforeDestruction: {
     type: Boolean,

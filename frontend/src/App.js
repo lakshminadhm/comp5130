@@ -8,17 +8,12 @@ import Header from './components/Header/Header';
 import NotFound from './components/NotFound/NotFound';
 import LoginForm from './components/LoginForm/LoginForm';
 import RegisterForm from './components/Registration/Registration';
-
-// A component to handle protected routes
-const ProtectedRoute = ({ element }) => {
-  const token = localStorage.getItem('token'); // Check if the user is logged in
-  return token ? element : <Navigate to="/login" />;
-};
+import ProtectedRoute from './ProtectedRoute';
 
 function App() {
   return (
     <Router>
-      <Container maxWidth="lg" style={{ marginTop: '50px' }}>
+      <Container maxWidth="lg" style={{ marginTop: '40px' }}>
 
         <Box
           sx={{
@@ -26,7 +21,7 @@ function App() {
             padding: '20px',
             borderRadius: '8px',
             boxShadow: '0px 4px 12px rgba(0,0,0,0.1)',
-            height: '600px', // Fixed height for the box
+            height: '750px', // Fixed height for the box
             overflowY: 'auto' // Makes the content scrollable when it exceeds the height
           }}
         >

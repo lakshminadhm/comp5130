@@ -17,7 +17,7 @@ function CreateNote() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [email, setEmail] = useState('');
   const [referenceName, setReferenceName] = useState('');
-  const [noteLink, setNoteLink] = useState('');
+  const [noteId, setNoteId] = useState(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -71,7 +71,7 @@ function CreateNote() {
 
       const result = response
 
-      setNoteLink(result.noteId);
+      setNoteId(result.noteId);
 
       setIsSubmitted(true);
     } catch (err) {
@@ -100,7 +100,7 @@ function CreateNote() {
   
         {!loading && (
           isSubmitted ? (
-            <NoteReady noteLink={noteLink} />  // Conditionally render NoteReady component
+            <NoteReady noteId={noteId} />  // Conditionally render NoteReady component
           ) : (
             <form onSubmit={handleSubmit}>
               <TextField
@@ -154,7 +154,7 @@ function CreateNote() {
                   <Grid container spacing={2}>
                     <Grid item xs={12} md={6}>
                       <TextField
-                        label="Enter a custom password"
+                        label="Enter a custom password to encrypt"
                         type="password"
                         fullWidth
                         value={password}

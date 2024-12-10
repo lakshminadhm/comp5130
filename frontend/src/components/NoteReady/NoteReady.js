@@ -1,14 +1,19 @@
 import React, { useState } from 'react';
 import { Container, Typography, Box, Button, TextField } from '@mui/material';
+import { deleteRequest } from '../../services/service';
+import { useNavigate } from 'react-router-dom';
 
-function NoteReady({ noteLink }) {
-  const noteId = "https://localhost:3000/view/"+ noteLink;
+function NoteReady({ noteId }) {
+  const navigate = useNavigate();
+
+  const noteLink = "https://localhost:3000/view/"+ noteId;
   const [copySuccess, setCopySuccess] = useState('');
-  console.log(noteId)
+  const [destroyMessage, setDestroyMessage] = useState('');
+
   // const noteLink = "https://privnote.com/ZfM9ZcUW#BIXwSkSNV";
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(noteId)
+    navigator.clipboard.writeText(noteLink)
       .then(() => {
         setCopySuccess('Link copied to clipboard!');
       })
@@ -17,8 +22,18 @@ function NoteReady({ noteLink }) {
       });
   };
 
-  const handleDestroy = () => {
-    // handle destroy logic
+  const handleDestroy = async () => {
+    const response = await deleteRequest( '/api/delete/'+ noteId, {'Authorization': `Bearer ${localStorage.getItem('token')}`});
+    console.log(response);
+    
+    if (response?.errorCode === undefined) {
+      setDestroyMessage('Note has been destroyed.'); // Set destroy message
+      setTimeout(() => {
+        navigate(`/`); // Navigate to home after 1 second
+      }, 1500);
+    } else {
+      console.log('Failed to destroy the note');
+    }
   }
 
   return (
@@ -32,7 +47,7 @@ function NoteReady({ noteLink }) {
 
         <TextField
           fullWidth
-          value={noteId}
+          value={noteLink}
           InputProps={{
             readOnly: true,
             style: { backgroundColor: '#ffffcc', padding: '10px' }
@@ -72,13 +87,30 @@ function NoteReady({ noteLink }) {
           </Typography>
         )}
 
-        {/* Destroy note button */}
-        <Box sx={{ textAlign: 'center', marginTop: '20px' }} onClick={handleDestroy}>
-          <Button variant="contained" color="error">
+        <Box sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '20px',
+            marginTop: '20px'
+          }}
+           >
+          <Button variant="contained" color="error" onClick={handleDestroy}>
             Destroy note now
           </Button>
+
+          <Button variant="contained" onClick={()=>navigate('/')}>
+            Go to Home
+          </Button>
         </Box>
-      </Box>
+
+        {/* Destroy Message */}
+        {destroyMessage && (
+            <Typography variant="h6" color="error" align="center" sx={{ marginTop: 2 }}>
+              {destroyMessage}
+            </Typography>
+        )}
+      </Box>     
+
     </Container>
   );
 }

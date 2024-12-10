@@ -19,9 +19,9 @@ exports.createNote = async (req, res) => {
 exports.getNoteById = async (req, res) => {
     const customId = req.params.id;
     try {
-        const note = await noteService.getNoteById(customId);
-        if (!note) {
-            return res.status(404).json({ message: 'Note not found or deleted' });
+        const note = await noteService.getNoteByIdAndStatus(customId);
+        if (note.errorCode !== undefined) {
+            return res.status(note.errorCode).json({ message: note.errorMessage });
         }
         res.json(note); // Return the note
     } catch (error) {

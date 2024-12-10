@@ -7,8 +7,9 @@ const request = async (url, method, body = null, headers = {}) => {
             method: method,
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 ...headers // Spread the additional headers if any
-            }
+            },
         };
 
         if (body) {
@@ -20,8 +21,7 @@ const request = async (url, method, body = null, headers = {}) => {
 
         // Check if response is not ok, throw error
         if (!response.ok) {
-            console.log(await response.json())
-            throw new Error(`Request failed with status ${response.status}`);
+            return {errorCode:response.status, errorMessage: await response.json() };
         }
 
         return response.json(); // Parse response as JSON

@@ -4,7 +4,7 @@ import { Container, Typography, Box, Button, CircularProgress, Alert, TextField 
 import ConfirmationDialog from '../ConfirmationDialog/ConfirmationDialog';
 import Loading from '../Loading/Loading';
 import NoteDestroyed from '../NoteDestroyed/NoteDestroyed';
-import { getRequest } from '../../services/service';
+import { deleteRequest, getRequest } from '../../services/service';
 
 function ViewNote() {
   const { noteId: urlNoteId } = useParams(); // Extract the noteId from the URL if available
@@ -13,6 +13,7 @@ function ViewNote() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showConfirmation, setShowConfirmation] = useState(true); // Show confirmation by default
+  const [confirmBeforeDestruction, setConfirmBeforeDestruction] = useState(true);
   const navigate = useNavigate();
   const [destroyed, setDestroyed] = useState(false);
 
@@ -25,7 +26,7 @@ function ViewNote() {
 
   // Fetch note details if URL noteId is provided
   useEffect(() => {
-    if (urlNoteId) {
+    if (noteId) {
       fetchNoteDetails(urlNoteId);
     }
   }, [urlNoteId]);
@@ -37,12 +38,13 @@ function ViewNote() {
 
     const response = await getRequest( '/api/note/'+id, {'Authorization': `Bearer ${localStorage.getItem('token')}`});
     console.log(response)
-    if(response){
-      setNote(response.text)
+    if(response.errorCode){
+      setError(response.errorMessage.message);
+        // setDestroyed(true);      
     }
     else{
-      setError('Note not found or already expired');
-        setDestroyed(true);
+      setNote(response.text)
+      setConfirmBeforeDestruction(response.confirmBeforeDestruction)
     }
     setLoading(false);
   };
@@ -71,6 +73,13 @@ function ViewNote() {
     }
   };
 
+  
+  const onConfirm = async () =>{
+    setShowConfirmation(false)
+    const response = await deleteRequest( '/api/delete/'+ noteId, {'Authorization': `Bearer ${localStorage.getItem('token')}`});
+    console.log(response);
+  }
+
   // If loading, show the loading indicator
   if (loading) {
     return (
@@ -93,6 +102,7 @@ function ViewNote() {
     return (
       <Container maxWidth="sm">
         <Box sx={{ textAlign: 'center', marginTop: 5 }}>
+          {console.log(error)}
           <Alert severity="error">{error}</Alert>
         </Box>
       </Container>
@@ -100,11 +110,11 @@ function ViewNote() {
   }
 
   // If note data is available but the user has not confirmed, show confirmation dialog
-  if (note && showConfirmation) {
+  if (note && showConfirmation && !confirmBeforeDestruction) {
     return (
       <ConfirmationDialog
         noteId={noteId}
-        onConfirm={() => setShowConfirmation(false)}
+        onConfirm={onConfirm}
         onCancel={() => navigate('/')}
       />
     );

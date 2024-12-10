@@ -48,7 +48,27 @@ exports.getNoteById = async (customId) => {
         return null; // no note found
     }
     decryptedText = cryptoFunc.decrypt(note.encryptedText, customId)
-    return {text: decryptedText}; // Return the note
+    return {text: decryptedText, confirmBeforeDestruction: note.confirmBeforeDestruction}; // Return the note
+};
+
+// Get a note by customId, checking if it's deleted and expired in the service
+exports.getNoteByIdAndStatus = async (customId) => {
+    const query = { customId };
+    const note = await genericService.findOne(Note, query);
+    if (!note) {
+        return { errorCode: 404, errorMessage: 'Note not found' };
+    }
+
+    const isExpired = calculateExpiryTime(note.createdAt, note.selfDestructTime);
+
+    // Check if note is deleted or expired
+    if (note.isDeleted || isExpired) {
+        return { errorCode: 403, errorMessage: 'Note is deleted or expired' };
+    }
+
+    decryptedText = cryptoFunc.decrypt(note.encryptedText, customId)
+    // console.log(this.deleteNote(customId));
+    return {text: decryptedText, confirmBeforeDestruction: note.confirmBeforeDestruction}; // Return the note
 };
 
 // Delete a note
@@ -70,5 +90,25 @@ function generateSalt() {
 
 // Function to hash the note content with the salt
 function hashNoteContent(content, salt) {
-    return crypto.createHash('sha256').update(content + salt).digest('hex');
+    return crypto.createHash('sha256').update(content + salt).digest('hex').slice(0,32);
 }
+
+const calculateExpiryTime = (createdAt, selfDestructTime) => {
+    const createdDate = new Date(createdAt);
+    let expiryTime;
+    switch (selfDestructTime) {
+        case '1 Hr':
+            expiryTime = new Date(createdDate.getTime() + 60 * 60 * 1000);
+        case '2 Hrs':
+            expiryTime = new Date(createdDate.getTime() + 2 * 60 * 60 * 1000);
+        case '1 day':
+            expiryTime = new Date(createdDate.getTime() + 24 * 60 * 60 * 1000);
+        case '1 week':
+            expiryTime = new Date(createdDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+        default:
+            expiryTime = createdDate; // "After reading it" or other cases
+    }
+
+    const isExpired = expiryTime === createdDate ? false : new Date() < expiryTime ;
+    return isExpired;
+};
