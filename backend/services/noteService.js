@@ -62,7 +62,7 @@ exports.getNoteByIdAndStatus = async (customId) => {
     }
 
     // Check if note is deleted or expired
-    if (note.isDeleted || new Date(note.expiresAt) < new Date()) {
+    if (note.isDeleted || (note.expiresAt!==null && new Date(note.expiresAt) < new Date())) {
         return { errorCode: 403, errorMessage: 'Note is deleted or expired' };
     }
 
