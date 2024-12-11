@@ -22,8 +22,9 @@ function CreateNote() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   // Enum-like object for self-destruct times
-  const SelfDestructTimes = {
+  const SelfDestructTimes = {    
     AFTER_READING: "After reading it",
+    ONE_MINUTE:"1 Min",
     ONE_HOUR: "1 Hr",
     TWO_HOURS: "2 Hrs",
   };
@@ -57,7 +58,7 @@ function CreateNote() {
       password,
       email,
       referenceName
-    };
+    };    
 
     try {
       setLoading(true);
@@ -81,6 +82,18 @@ function CreateNote() {
       setLoading(false);
     }
   };
+
+  const handleShowOptions = (e) => {
+    setShowOptions(!showOptions)
+    if(showOptions==false){
+      setSelfDestructTime('After reading it');
+      setConfirmBeforeDestruction(false);
+      setPassword('');
+      setConfirmPassword('');
+      setEmail('');
+      setReferenceName('');
+    }
+  }
 
   // // Conditionally render NoteReady or the form
   // if (isSubmitted) {
@@ -113,10 +126,27 @@ function CreateNote() {
                 sx={{ marginBottom: 2 }}
               />
   
-              <Button type="submit" variant="contained" color="primary" sx={{ marginRight: 2 }}>Create Note</Button>
-              <Button variant="outlined" onClick={() => setShowOptions(!showOptions)}>
-                {showOptions ? "Hide" : "Show"} options
-              </Button>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                  >
+                    Create Note
+                  </Button>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Button
+                    variant="outlined"
+                    fullWidth
+                    onClick={handleShowOptions}
+                  >
+                    {showOptions ? "Disable" : "Show"} Options
+                  </Button>
+                </Grid>
+              </Grid>
   
               {showOptions && (
                 <Box className="options-section" sx={{ marginTop: 2 }}>

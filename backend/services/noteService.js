@@ -14,7 +14,9 @@ exports.createNote = async (inputNote) => {
 
     const selfDestructOptions = {
         'After reading it': null,  // If it's set to 'After reading it', you may handle it differently later
-        '1 hour': 1 * 60 * 60 * 1000,  // 1 hour in milliseconds
+        '1 Min': 1 * 60 * 1000,
+        '1 Hr': 1 * 60 * 60 * 1000,  // 1 hour in milliseconds
+        '2 Hrs': 2 * 60 * 60 * 1000,
         '1 day': 24 * 60 * 60 * 1000,  // 1 day in milliseconds
         '1 week': 7 * 24 * 60 * 60 * 1000,  // 1 week in milliseconds
       };
@@ -59,10 +61,8 @@ exports.getNoteByIdAndStatus = async (customId) => {
         return { errorCode: 404, errorMessage: 'Note not found' };
     }
 
-    const isExpired = calculateExpiryTime(note.createdAt, note.selfDestructTime);
-
     // Check if note is deleted or expired
-    if (note.isDeleted || isExpired) {
+    if (note.isDeleted || new Date(note.expiresAt) < new Date()) {
         return { errorCode: 403, errorMessage: 'Note is deleted or expired' };
     }
 
@@ -92,23 +92,3 @@ function generateSalt() {
 function hashNoteContent(content, salt) {
     return crypto.createHash('sha256').update(content + salt).digest('hex').slice(0,32);
 }
-
-const calculateExpiryTime = (createdAt, selfDestructTime) => {
-    const createdDate = new Date(createdAt);
-    let expiryTime;
-    switch (selfDestructTime) {
-        case '1 Hr':
-            expiryTime = new Date(createdDate.getTime() + 60 * 60 * 1000);
-        case '2 Hrs':
-            expiryTime = new Date(createdDate.getTime() + 2 * 60 * 60 * 1000);
-        case '1 day':
-            expiryTime = new Date(createdDate.getTime() + 24 * 60 * 60 * 1000);
-        case '1 week':
-            expiryTime = new Date(createdDate.getTime() + 7 * 24 * 60 * 60 * 1000);
-        default:
-            expiryTime = createdDate; // "After reading it" or other cases
-    }
-
-    const isExpired = expiryTime === createdDate ? false : new Date() < expiryTime ;
-    return isExpired;
-};

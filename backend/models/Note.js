@@ -33,7 +33,7 @@ const NoteSchema = new mongoose.Schema({
   selfDestructTime: {
     type: String,
     default: 'After reading it',
-    enum: ['After reading it', '1 Hr', '2 Hrs', '1 day', '1 week'], // You can add more options as needed
+    enum: ['After reading it','1 Min', '1 Hr', '2 Hrs', '1 day', '1 week'], // You can add more options as needed
   },
   confirmBeforeDestruction: {
     type: Boolean,
