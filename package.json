@@ -1,4 +1,5 @@
 {
+  "name": "comp5130",
   "dependencies": {},
   "devDependencies": {
     "concurrently": "^7.0.0"
