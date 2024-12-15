@@ -5,7 +5,7 @@
     "concurrently": "^7.0.0"
   },
   "scripts": {
-    "install": "concurrently \"(cd frontend && npm install)\" \"(cd backend && npm install)\"",
+    "install": "concurrently \"(cd frontend && npm install --legacy-peer-deps)\" \"(cd backend && npm install)\"",
     "start": "concurrently \"(cd frontend && npm start)\" \"(cd backend && npm start)\"",
     "build": "npm run build-frontend",
     "build-frontend": "cd frontend && npm install && npm run build",
