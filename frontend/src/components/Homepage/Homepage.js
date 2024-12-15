@@ -18,6 +18,7 @@ const Homepage = () => {
   return (
     <Container maxWidth="md" sx={{p:0}}>
       <Box 
+      minHeight={"50vh"}
         className="box" 
         display="flex" 
         flexDirection="column" 

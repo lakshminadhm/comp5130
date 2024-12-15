@@ -12,7 +12,7 @@ function Header() {
 
     // Handle clicking on the title (navigates to homepage)
     const handleClick = () => {
-        navigate('/');
+        localStorage.getItem('token') ? navigate('/') : navigate('/login') ;
     };
 
     // Handle logout functionality

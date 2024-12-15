@@ -80,9 +80,6 @@ exports.deleteNote = async (customId) => {
     return { message: "Note has been deleted" }; // Handle success
 };
 
-
-
-
 // Function to generate a random salt
 function generateSalt() {
     return crypto.randomBytes(32).toString('hex'); // 16 bytes => 32 hex characters
