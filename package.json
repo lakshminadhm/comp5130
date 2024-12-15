@@ -1,0 +1,17 @@
+{
+  "name": "comp5130",
+  "dependencies": {},
+  "devDependencies": {
+    "concurrently": "^7.0.0"
+  },
+  "scripts": {
+    "install": "concurrently \"(cd frontend && npm install --legacy-peer-deps)\" \"(cd backend && npm install)\"",
+    "start": "concurrently \"(cd frontend && npm start)\" \"(cd backend && npm start)\"",
+    "build": "npm run build-frontend",
+    "build-frontend": "cd frontend && npm install && npm run build",
+    "build-backend": "cd backend && npm install && npm run build || echo 'No backend build script found!'",
+    "test": "npm run test-frontend && npm run test-backend",
+    "test-frontend": "cd frontend && npm install && npm test",
+    "test-backend": "cd backend && npm install && npm test || echo 'No backend tests defined!'"
+  }
+}
