@@ -47,11 +47,9 @@ const RegisterForm = () => {
             const response = await postRequest('/api/register', request);
 
             if (response?.errorCode == undefined) {
-                console.log(response)
                 alert(response.message)
                 navigate('/login'); // Redirect to homepage after registration
             } else {
-                console.log(response)
                 setError(response.errorMessage.message);
             }
         } catch (error) {
