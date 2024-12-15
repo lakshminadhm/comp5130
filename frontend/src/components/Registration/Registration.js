@@ -46,11 +46,11 @@ const RegisterForm = () => {
             const request = { "username": username, "email": email, "password": password };
             const response = await postRequest('/api/register', request);
 
-            if (response) {
-                localStorage.setItem('token', response.token); // Automatically log in the user
-                navigate('/'); // Redirect to homepage after registration
+            if (response?.errorCode == undefined) {
+                alert(response.message)
+                navigate('/login'); // Redirect to homepage after registration
             } else {
-                setError(response.message);
+                setError(response.errorMessage.message);
             }
         } catch (error) {
             setError('Error registering, please try again.');
