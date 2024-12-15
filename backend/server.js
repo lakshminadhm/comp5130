@@ -72,13 +72,13 @@ connectDB();
 app.use(express.json());
 
 // Add routes
-const notesRouter = require('../backend/routes/routes.js');
+const notesRouter = require('./routes/routes.js');
 app.use('/api', notesRouter);
 
 // HTTPS Server options with SSL certificates
 const options = {
-    key: fs.readFileSync('../certs/cryptonote.key'),
-    cert: fs.readFileSync('../certs/cryptonote.crt'),
+    key: fs.readFileSync('./certs/cryptonote.key'),
+    cert: fs.readFileSync('./certs/cryptonote.crt'),
 };
 
 // Create HTTPS server
