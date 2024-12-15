@@ -39,6 +39,7 @@ const ProtectedRoute = ({ element }) => {
     const currentTime = Date.now() / 1000; // Current time in seconds
     if (decodedToken.exp < currentTime) {
       // Token is expired
+      localStorage.removeItem('token');
       console.warn("Token expired. Redirecting to login...");
       return renderExpiredMessage();
     }
