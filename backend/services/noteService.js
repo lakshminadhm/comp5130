@@ -2,90 +2,289 @@ const genericService = require('./genericService');
 const Note = require('../models/Note');
 const crypto = require('crypto');
 const cryptoFunc = require('../crypto/cryptoFunc');
-const { decrypt } = require('dotenv');
+const logger = require('../config/logger');
 
 // Create a new note
 exports.createNote = async (inputNote) => {
-    const salt = generateSalt(); // Generate a unique salt
-    const hash = hashNoteContent(inputNote, salt); // Hash the note with the salt
-    // console.log(hash)
+    const requestId = inputNote.requestId || 'MISSING';
 
-    encryptedText = cryptoFunc.encrypt(inputNote.noteText, hash)    
+    logger.info({
+        type: 'REQUEST',
+        message: 'Create Note Request',
+        requestId,
+        timestamp: new Date().toISOString(),
+        payload: inputNote,
+        class: 'NoteService',
+        function:'createNote'
+    });
 
-    const selfDestructOptions = {
-        'After reading it': null,  // If it's set to 'After reading it', you may handle it differently later
-        '1 Min': 1 * 60 * 1000,
-        '1 Hr': 1 * 60 * 60 * 1000,  // 1 hour in milliseconds
-        '2 Hrs': 2 * 60 * 60 * 1000,
-        '1 day': 24 * 60 * 60 * 1000,  // 1 day in milliseconds
-        '1 week': 7 * 24 * 60 * 60 * 1000,  // 1 week in milliseconds
-      };
-      
-      // Calculate expiration time based on selfDestructTime
-      const destructTimeInMilliseconds = selfDestructOptions[inputNote.selfDestructTime] || 0;
-      const expiresAt = destructTimeInMilliseconds ? new Date(Date.now() + destructTimeInMilliseconds) : null;
-      
-      const newNote = new Note({
-        encryptedText: encryptedText,
-        password: inputNote.password || null,  // If no password, store null
-        expiresAt: expiresAt,  // Set calculated expiration date
-        customId: hash,  // The unique ID for this note
-        selfDestructTime: inputNote.selfDestructTime,  // Store the self-destruct time option
-        confirmBeforeDestruction: inputNote.confirmBeforeDestruction || false,  // Use the value from input, or default to false
-        email: inputNote.email || '',  // Store email, default to an empty string if not provided
-        referenceName: inputNote.referenceName || '',  // Store reference name, default to empty string if not provided
-      });
-      
-    
-    const response = await Note.create(newNote); // Save the note
-    
-    return { message: 'Note created', noteId: response.customId }; // Return the customId to the user
+    try {
+        const salt = generateSalt(); // Generate a unique salt
+        const hash = hashNoteContent(inputNote.noteText, salt); // Hash the note with the salt
+        const encryptedText = cryptoFunc.encrypt(inputNote.noteText, hash);
+
+        const selfDestructOptions = {
+            'After reading it': null,
+            '1 Min': 1 * 60 * 1000,
+            '1 Hr': 1 * 60 * 60 * 1000,
+            '2 Hrs': 2 * 60 * 60 * 1000,
+            '1 day': 24 * 60 * 60 * 1000,
+            '1 week': 7 * 24 * 60 * 60 * 1000,
+        };
+
+        const destructTimeInMilliseconds = selfDestructOptions[inputNote.selfDestructTime] || 0;
+        const expiresAt = destructTimeInMilliseconds ? new Date(Date.now() + destructTimeInMilliseconds) : null;
+
+        const newNote = new Note({
+            encryptedText: encryptedText,
+            password: inputNote.password || null,
+            expiresAt: expiresAt,
+            customId: hash,
+            selfDestructTime: inputNote.selfDestructTime,
+            confirmBeforeDestruction: inputNote.confirmBeforeDestruction || false,
+            email: inputNote.email || '',
+            referenceName: inputNote.referenceName || '',
+        });
+
+        const response = await Note.create(newNote); // Save the note
+
+        logger.info({
+            type: 'RESPONSE',
+            message: 'Note Created Successfully',
+            class: 'NoteService',
+            function:'createNote',
+            requestId,
+            statusCode: 201,
+            timestamp: new Date().toISOString(),
+            noteId: response.customId,
+        });
+
+        return { message: 'Note created', noteId: response.customId }; // Return the customId to the user
+    } catch (error) {
+        logger.error({
+            type: 'RESPONSE',
+            message: 'Error Creating Note',
+            class: 'NoteService',
+            function:'createNote',
+            requestId,
+            statusCode: 500,
+            timestamp: new Date().toISOString(),
+            error: error.message,
+        });
+
+        throw new Error('Failed to create note');
+    }
 };
 
-// Get a note by customId, checking if it's deleted in the service
-exports.getNoteById = async (customId) => {
-    const query = { customId, isDeleted: false };
-    const note = await genericService.findOne(Note, query);
-    if (!note) {
-        return null; // no note found
+// Get a note by customId
+exports.getNoteById = async ({ customId, requestId }) => {
+
+    logger.info({
+        type: 'REQUEST',
+        message: 'Get Note By ID Request',
+        class: 'NoteService',
+        function:'getNoteById',
+        requestId,
+        customId,
+        timestamp: new Date().toISOString(),
+    });
+
+    try {
+        const query = { customId, isDeleted: false };
+        const note = await genericService.findOne(Note, query, requestId);
+
+        if (!note) {
+            logger.warn({
+                type: 'RESPONSE',
+                message: 'Note Not Found',
+                class: 'NoteService',
+                function:'getNoteById',
+                requestId,
+                customId,
+                statusCode: 404,
+                timestamp: new Date().toISOString(),
+            });
+
+            return null; // No note found
+        }
+
+        const decryptedText = cryptoFunc.decrypt(note.encryptedText, customId);
+
+        logger.info({
+            type: 'RESPONSE',
+            message: 'Note Retrieved Successfully',
+            class: 'NoteService',
+            function:'getNoteById',
+            requestId,
+            customId,
+            statusCode: 200,
+            timestamp: new Date().toISOString(),
+            note: { text: decryptedText },
+        });
+
+        return { text: decryptedText, confirmBeforeDestruction: note.confirmBeforeDestruction };
+    } catch (error) {
+        logger.error({
+            type: 'RESPONSE',
+            message: 'Error Retrieving Note',
+            class: 'NoteService',
+            function:'getNoteById',
+            requestId,
+            customId,
+            statusCode: 500,
+            timestamp: new Date().toISOString(),
+            error: error.message,
+        });
+
+        throw new Error('Failed to retrieve note');
     }
-    decryptedText = cryptoFunc.decrypt(note.encryptedText, customId)
-    return {text: decryptedText, confirmBeforeDestruction: note.confirmBeforeDestruction}; // Return the note
 };
 
-// Get a note by customId, checking if it's deleted and expired in the service
-exports.getNoteByIdAndStatus = async (customId) => {
-    const query = { customId };
-    const note = await genericService.findOne(Note, query);
-    if (!note) {
-        return { errorCode: 404, errorMessage: 'Note not found' };
-    }
+// Get a note by customId with status check
+exports.getNoteByIdAndStatus = async ({ customId, requestId }) => {
 
-    // Check if note is deleted or expired
-    if (note.isDeleted || (note.expiresAt!==null && new Date(note.expiresAt) < new Date())) {
-        return { errorCode: 403, errorMessage: 'Note is deleted or expired' };
-    }
+    logger.info({
+        type: 'REQUEST',
+        message: 'Get Note By ID and Status Request',
+        class: 'NoteService',
+        function:'getNoteByIdAndStatus',
+        requestId,
+        customId,
+        timestamp: new Date().toISOString(),
+    });
 
-    decryptedText = cryptoFunc.decrypt(note.encryptedText, customId)
-    // console.log(this.deleteNote(customId));
-    return {text: decryptedText, confirmBeforeDestruction: note.confirmBeforeDestruction}; // Return the note
+    try {
+        const query = { customId };
+        const note = await genericService.findOne(Note, query, requestId);
+
+        if (!note) {
+            logger.warn({
+                type: 'RESPONSE',
+                message: 'Note Not Found',
+                class: 'NoteService',
+                function:'getNoteByIdAndStatus',
+                requestId,
+                customId,
+                statusCode: 404,
+                timestamp: new Date().toISOString(),
+            });
+
+            return { errorCode: 404, errorMessage: 'Note not found' };
+        }
+
+        if (note.isDeleted || (note.expiresAt !== null && new Date(note.expiresAt) < new Date())) {
+            logger.warn({
+                type: 'RESPONSE',
+                message: 'Note Deleted or Expired',
+                class: 'NoteService',
+                function:'getNoteByIdAndStatus',
+                requestId,
+                customId,
+                statusCode: 403,
+                timestamp: new Date().toISOString(),
+            });
+
+            return { errorCode: 403, errorMessage: 'Note is deleted or expired' };
+        }
+
+        const decryptedText = cryptoFunc.decrypt(note.encryptedText, customId);
+
+        logger.info({
+            type: 'RESPONSE',
+            message: 'Note Retrieved Successfully',
+            class: 'NoteService',
+            function:'getNoteByIdAndStatus',
+            requestId,
+            customId,
+            statusCode: 200,
+            timestamp: new Date().toISOString(),
+            note: { text: decryptedText },
+        });
+
+        return { text: decryptedText, confirmBeforeDestruction: note.confirmBeforeDestruction };
+    } catch (error) {
+        logger.error({
+            type: 'RESPONSE',
+            message: 'Error Retrieving Note with Status Check',
+            class: 'NoteService',
+            function:'getNoteByIdAndStatus',
+            requestId,
+            customId,
+            statusCode: 500,
+            timestamp: new Date().toISOString(),
+            error: error.message,
+        });
+
+        throw new Error('Failed to retrieve note');
+    }
 };
 
 // Delete a note
-exports.deleteNote = async (customId) => {
-    const result = await genericService.updateOne(Note, { customId }, { $set: { isDeleted: true } });
-    if (result.matchedCount === 0) {
-        return { error: "Failed to delete or note not found" }; // Handle failure
+exports.deleteNote = async ({ customId, requestId }) => {
+
+    logger.info({
+        type: 'REQUEST',
+        message: 'Delete Note Request',
+        class: 'NoteService',
+        function:'deleteNote',
+        requestId,
+        customId,
+        timestamp: new Date().toISOString(),
+    });
+
+    try {
+        const result = await genericService.updateOne(Note, { customId }, { $set: { isDeleted: true } }, requestId);
+
+        if (result.matchedCount === 0) {
+            logger.warn({
+                type: 'RESPONSE',
+                message: 'Note Not Found or Failed to Delete',
+                class: 'NoteService',
+                function:'deleteNote',
+                requestId,
+                customId,
+                statusCode: 404,
+                timestamp: new Date().toISOString(),
+            });
+
+            return { error: 'Failed to delete or note not found' };
+        }
+
+        logger.info({
+            type: 'RESPONSE',
+            message: 'Note Deleted Successfully',
+            class: 'NoteService',
+            function:'deleteNote',
+            requestId,
+            customId,
+            statusCode: 200,
+            timestamp: new Date().toISOString(),
+        });
+
+        return { message: 'Note has been deleted' };
+    } catch (error) {
+        logger.error({
+            type: 'RESPONSE',
+            message: 'Error Deleting Note',
+            class: 'NoteService',
+            function:'deleteNote',
+            requestId,
+            customId,
+            statusCode: 500,
+            timestamp: new Date().toISOString(),
+            error: error.message,
+        });
+
+        throw new Error('Failed to delete note');
     }
-    return { message: "Note has been deleted" }; // Handle success
 };
 
 // Function to generate a random salt
 function generateSalt() {
-    return crypto.randomBytes(32).toString('hex'); // 16 bytes => 32 hex characters
+    return crypto.randomBytes(32).toString('hex');
 }
 
 // Function to hash the note content with the salt
 function hashNoteContent(content, salt) {
-    return crypto.createHash('sha256').update(content + salt).digest('hex').slice(0,32);
+    return crypto.createHash('sha256').update(content + salt).digest('hex').slice(0, 32);
 }

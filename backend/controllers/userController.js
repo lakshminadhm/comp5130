@@ -22,6 +22,8 @@ exports.register = async (req, res) => {
             logger.warn({
                 type: 'RESPONSE',
                 message: 'User already exists',
+                funtion:'register',
+                class: 'UserController',
                 email,
                 requestId,
                 statusCode: 400,
@@ -37,6 +39,8 @@ exports.register = async (req, res) => {
         logger.info({
             type: 'RESPONSE',
             message: 'User registered successfully',
+            class: 'UserController',
+            funtion:'register',
             email,
             requestId,
             statusCode: 201,
@@ -48,6 +52,8 @@ exports.register = async (req, res) => {
         logger.error({
             type: 'RESPONSE',
             message: 'Error during registration',
+            class: 'UserController',
+            funtion:'register',
             email,
             requestId,
             error: error.message,
@@ -66,6 +72,8 @@ exports.login = async (req, res) => {
     logger.info({
         type: 'REQUEST',
         message: 'User login attempt',
+        class: 'UserController',
+        funtion:'login',
         email,
         requestId,
         timestamp: new Date().toISOString(),
@@ -77,6 +85,8 @@ exports.login = async (req, res) => {
             logger.warn({
                 type: 'RESPONSE',
                 message: 'User not found',
+                class: 'UserController',
+                funtion:'login',
                 email,
                 requestId,
                 statusCode: 404,
@@ -90,6 +100,8 @@ exports.login = async (req, res) => {
             logger.warn({
                 type: 'RESPONSE',
                 message: 'Invalid credentials',
+                class: 'UserController',
+                funtion:'login',
                 email,
                 requestId,
                 statusCode: 400,
@@ -103,6 +115,8 @@ exports.login = async (req, res) => {
         logger.info({
             type: 'RESPONSE',
             message: 'User login successful',
+            class: 'UserController',
+            funtion:'login',
             email,
             requestId,
             statusCode: 200,
@@ -114,6 +128,8 @@ exports.login = async (req, res) => {
         logger.error({
             type: 'RESPONSE',
             message: 'Error during login',
+            class: 'UserController',
+            funtion:'login',
             email,
             requestId,
             error: error.message,
@@ -131,6 +147,8 @@ exports.editUserDetails = async (req, res) => {
     logger.info({
         type: 'REQUEST',
         message: 'Edit user details attempt',
+        class: 'UserController',
+        funtion:'editUserDetails',
         requestId,
         timestamp: new Date().toISOString(),
     });
@@ -140,6 +158,8 @@ exports.editUserDetails = async (req, res) => {
         logger.info({
             type: 'RESPONSE',
             message: 'Edit user details successful',
+            class: 'UserController',
+            funtion:'editUserDetails',
             requestId,
             statusCode: 200,
             timestamp: new Date().toISOString(),
@@ -149,6 +169,8 @@ exports.editUserDetails = async (req, res) => {
         logger.error({
             type: 'RESPONSE',
             message: 'Error editing user details',
+            class: 'UserController',
+            funtion:'editUserDetails',
             requestId,
             error: error.message,
             statusCode: 500,
