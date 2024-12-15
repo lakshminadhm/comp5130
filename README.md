@@ -67,6 +67,27 @@ root/
 
 ---
 
+### Environment Variables
+Include a .env file for both the frontend and backend:
+
+#### Backend .env file
+```
+MONGO_URI=mongodb+srv://lakshminadhmakkena:db123@student.5sy6b.mongodb.net/NotesDB?retryWrites=true&w=majority&appName=student
+
+JWT_SECRET=jwttempkey
+```
+
+#### Frondend .env file
+```
+HTTPS = true
+SSL_CRT_FILE = ../certs/cryptonote.crt
+SSL_KEY_FILE = ../certs/cryptonote.key
+
+
+REACT_APP_API_BASE_URL = https://localhost:5000
+
+```
+
 ### Installation
 
 To install all dependencies for both the **frontend** and **backend**, run:
@@ -95,6 +116,8 @@ This command:
 
 The applications will run concurrently.
 
+#### Now go to [localhost](https://localhost:3000/) to view frontend and [API Documentation](https://localhost:5000/api-docs/#/) for backend API documentation.
+
 ---
 
 ### Building the Project
@@ -109,47 +132,9 @@ npm run build-frontend
 The production-ready build will be output in the `frontend/build` directory.
 
 #### Build the Backend
-If the backend requires a build process, you can build it with:
-
-```bash
-npm run build-backend
-```
+We don't have explicit backend build scripts.
 
 If no backend build script is defined, this command will display a message: `No backend build script found!`.
-
-#### Build Both (Optional)
-If you want to build both the frontend and backend together, run:
-
-```bash
-npm run build
-```
-
----
-
-### Testing the Project
-
-#### Test the Frontend
-To run tests for the frontend application, run:
-
-```bash
-npm run test-frontend
-```
-
-#### Test the Backend
-To run tests for the backend application, run:
-
-```bash
-npm run test-backend
-```
-
-If no backend tests are defined, the command will display a message: `No backend tests defined!`.
-
-#### Test Both
-To test both the frontend and backend sequentially, run:
-
-```bash
-npm run test
-```
 
 ---
 

@@ -97,7 +97,7 @@ router.post('/login', userController.login); // Login route
  *       404:
  *         description: Note not found
  */
-router.get('/note/:id', notesController.getNoteById);
+router.get('/note/:id', authMiddleware, notesController.getNoteById);
 
 /**
  * @swagger
@@ -160,7 +160,7 @@ router.get('/note/:id', notesController.getNoteById);
  *                   description: Error message
  *                   example: "Server error while updating user details."
  */
-router.put('/user/', userController.editUserDetails);
+router.put('/user/', authMiddleware, userController.editUserDetails);
 
 /**
  * @swagger
@@ -212,6 +212,6 @@ router.post('/note', authMiddleware, notesController.createNote);
  *       404:
  *         description: Note not found
  */
-router.delete('/delete/:id', notesController.deleteNote);
+router.delete('/delete/:id', authMiddleware, notesController.deleteNote);
 
 module.exports = router;

@@ -1,9 +1,11 @@
 import React from 'react';
 import { Container, Typography, Box, Button, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import './Homepage.css';
 
 const Homepage = () => {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
 
   // Handlers to navigate to different pages
@@ -41,7 +43,7 @@ const Homepage = () => {
           }}
           gutterBottom
         >
-          Welcome to Crypto Note!
+          {t('welcome_message')}
         </Typography>
         <Typography variant="h6" sx={{
             fontSize: {
@@ -51,7 +53,7 @@ const Homepage = () => {
             },           
           }}
           gutterBottom>
-          Create self-destructing notes and share them securely with friends.
+          {t('description')}
         </Typography>
 
         <Grid container spacing={2} justifyContent="center" mt={4}>
@@ -71,7 +73,7 @@ const Homepage = () => {
                 }
               }}
             >
-              Create a New Note
+              {t('create_note')}
             </Button>
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -90,7 +92,7 @@ const Homepage = () => {
                 }
               }}
             >
-              View a Note
+              {t('view_note')}
             </Button>
           </Grid>
         </Grid>

@@ -1,14 +1,24 @@
 import React from 'react';
-import { Typography, Button, Box  } from '@mui/material';
+import { Typography, Button, Box, MenuItem, Select  } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTranslation } from 'react-i18next';
 
 function Header() {
     const navigate = useNavigate();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // Breakpoint for small screens
+
+
+    const { t, i18n } = useTranslation(); // Initialize translation hook
+
+    const handleLanguageChange = (event) => {
+        const selectedLanguage = event.target.value;
+        i18n.changeLanguage(selectedLanguage); // Change the language
+    };
+
 
     // Handle clicking on the title (navigates to homepage)
     const handleClick = () => {
@@ -36,7 +46,23 @@ function Header() {
                 borderBottom="1px solid #ddd"
             >
                 {/* Empty Box to push the title to the center */}
-                <Box flex={1} />
+                <Box flex={1}>
+                    <Select
+                        value={i18n.language} // Current language
+                        onChange={handleLanguageChange}
+                        variant="outlined"
+                        size={isMobile ? "small" : "medium"} 
+                        sx={{
+                            '& .MuiSelect-select': {
+                              padding: '5px 10px', // Adjust padding here
+                            },
+                          }}                       
+                    >
+                        <MenuItem value="en">EN</MenuItem>
+                        <MenuItem value="fr">FR</MenuItem>
+                        <MenuItem value="telugu">Telugu</MenuItem>
+                    </Select>
+                </Box>
                 {/* Clicking the title navigates to the homepage */}
                 <Box 
                     onClick={handleClick}

@@ -7,7 +7,7 @@ exports.healthCheck = async (req, res) => {
     logger.info({
         type: 'REQUEST',
         message: 'Health Check Request',
-        class: 'UserController',
+        class: 'NotesController',
         funtion:'healthCheck',
         requestId,
         timestamp: new Date().toISOString(),
@@ -18,7 +18,7 @@ exports.healthCheck = async (req, res) => {
     logger.info({
         type: 'RESPONSE',
         message: 'Health Check Response',
-        class: 'UserController',
+        class: 'NotesController',
         funtion:'healthCheck',
         requestId,
         statusCode: 200,
@@ -28,13 +28,14 @@ exports.healthCheck = async (req, res) => {
 
 exports.createNote = async (req, res) => {
     const requestId = req.requestId; // Use the requestId generated in middleware
-
+    
     logger.info({
         type: 'REQUEST',
         message: 'Create Note Request',
-        class: 'UserController',
+        class: 'NotesController',
         funtion:'createNote',
         requestId,
+        user:req.user.email,
         timestamp: new Date().toISOString(),
         payload: req.body,
     });
@@ -46,8 +47,9 @@ exports.createNote = async (req, res) => {
         logger.info({
             type: 'RESPONSE',
             message: 'Note Created Successfully',
-            class: 'UserController',
+            class: 'NotesController',
             funtion:'createNote',
+            user:req.user.email,
             requestId,
             statusCode: 200,
             timestamp: new Date().toISOString(),
@@ -59,8 +61,9 @@ exports.createNote = async (req, res) => {
         logger.error({
             type: 'RESPONSE',
             message: 'Error Creating Note',
-            class: 'UserController',
+            class: 'NotesController',
             funtion:'createNote',
+            user:req.user.email,
             requestId,
             statusCode: 500,
             error: error.message,
@@ -78,8 +81,9 @@ exports.getNoteById = async (req, res) => {
     logger.info({
         type: 'REQUEST',
         message: 'Get Note By ID Request',
-        class: 'UserController',
+        class: 'NotesController',
         funtion:'getNoteById',
+        user:req.user.email,
         requestId,
         customId,
         timestamp: new Date().toISOString(),
@@ -92,8 +96,9 @@ exports.getNoteById = async (req, res) => {
             logger.warn({
                 type: 'RESPONSE',
                 message: 'Note Not Found or Deleted',
-                class: 'UserController',
+                class: 'NotesController',
                 funtion:'getNoteById',
+                user:req.user.email,
                 requestId,
                 customId,
                 statusCode: note.errorCode,
@@ -107,8 +112,9 @@ exports.getNoteById = async (req, res) => {
         logger.info({
             type: 'RESPONSE',
             message: 'Note Retrieved Successfully',
-            class: 'UserController',
+            class: 'NotesController',
             funtion:'getNoteById',
+            user:req.user.email,
             requestId,
             customId,
             statusCode: 200,
@@ -121,8 +127,9 @@ exports.getNoteById = async (req, res) => {
         logger.error({
             type: 'RESPONSE',
             message: 'Error Retrieving Note',
-            class: 'UserController',
+            class: 'NotesController',
             funtion:'getNoteById',
+            user:req.user.email,
             requestId,
             customId,
             statusCode: 500,
@@ -141,8 +148,9 @@ exports.deleteNote = async (req, res) => {
     logger.info({
         type: 'REQUEST',
         message: 'Delete Note Request',
-        class: 'UserController',
+        class: 'NotesController',
         funtion:'deleteNote',
+        user:req.user.email,
         requestId,
         customId,
         timestamp: new Date().toISOString(),
@@ -155,8 +163,9 @@ exports.deleteNote = async (req, res) => {
             logger.warn({
                 type: 'RESPONSE',
                 message: 'Error Deleting Note',
-                class: 'UserController',
+                class: 'NotesController',
                 funtion:'deleteNote',
+                user:req.user.email,
                 requestId,
                 customId,
                 statusCode: 400,
@@ -170,8 +179,9 @@ exports.deleteNote = async (req, res) => {
         logger.info({
             type: 'RESPONSE',
             message: 'Note Deleted Successfully',
-            class: 'UserController',
+            class: 'NotesController',
             funtion:'deleteNote',
+            user:req.user.email,
             requestId,
             customId,
             statusCode: 200,
@@ -184,8 +194,9 @@ exports.deleteNote = async (req, res) => {
         logger.error({
             type: 'RESPONSE',
             message: 'Error Deleting Note',
-            class: 'UserController',
+            class: 'NotesController',
             funtion:'deleteNote',
+            user:req.user.email,
             requestId,
             customId,
             statusCode: 500,
