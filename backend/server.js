@@ -81,6 +81,13 @@ const options = {
     cert: fs.readFileSync('./certs/cryptonote.crt'),
 };
 
+// Serve Swagger JSON at a specific endpoint
+app.get('/swagger.json', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(swaggerDocs);
+});
+
+
 // Create HTTPS server
 const httpsServer = https.createServer(options, app);
 
