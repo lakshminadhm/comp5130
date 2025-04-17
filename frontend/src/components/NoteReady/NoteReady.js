@@ -1,131 +1,186 @@
 import React, { useState } from 'react';
-import { Container, Typography, Box, Button, TextField, useMediaQuery, useTheme } from '@mui/material';
+import { 
+  Typography, Box, Button, TextField, useMediaQuery, useTheme,
+  Paper, Alert, Snackbar, IconButton, Tooltip, Container
+} from '@mui/material';
 import { deleteRequest } from '../../services/service';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import EmailIcon from '@mui/icons-material/Email';
+import DeleteIcon from '@mui/icons-material/Delete';
+import HomeIcon from '@mui/icons-material/Home';
+import {QRCodeSVG} from 'qrcode.react';
 
 function NoteReady({ noteId }) {
   const navigate = useNavigate();
   const theme = useTheme();
+  const { t } = useTranslation();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const noteLink = "https://localhost:3000/view/" + noteId;
-  const [copySuccess, setCopySuccess] = useState('');
-  const [destroyMessage, setDestroyMessage] = useState('');
+  const baseUrl = process.env.REACT_APP_BASE_URL || window.location.origin;
+  const noteLink = `${baseUrl}/view/${noteId}`;
+  
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [isDestroying, setIsDestroying] = useState(false);
 
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(noteLink)
-      .then(() => {
-        setCopySuccess('Link copied to clipboard!');
-      })
-      .catch(() => {
-        setCopySuccess('Failed to copy link.');
-      });
-  };
-
-  const handleDestroy = async () => {
-    const response = await deleteRequest('/api/delete/' + noteId, { Authorization: `Bearer ${localStorage.getItem('token')}` });
-    if (response?.errorCode === undefined) {
-      setDestroyMessage('Note has been destroyed.');
-      setTimeout(() => {
-        navigate(`/`);
-      }, 1500);
-    } else {
-      console.log('Failed to destroy the note');
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(noteLink);
+      showSnackbar(t('link_copied_success'), 'success');
+    } catch (error) {
+      showSnackbar(t('link_copied_error'), 'error');
     }
   };
 
+  const handleDestroy = async () => {
+    try {
+      setIsDestroying(true);
+      const response = await deleteRequest(`/api/delete/${noteId}`, {
+        Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+      });
+      
+      if (response?.errorCode === undefined) {
+        showSnackbar(t('note_destroyed_success'), 'success');
+        setTimeout(() => navigate('/'), 2000);
+      } else {
+        showSnackbar(t('note_destroyed_error'), 'error');
+      }
+    } catch (error) {
+      showSnackbar(t('note_destroyed_error'), 'error');
+    } finally {
+      setIsDestroying(false);
+    }
+  };
+
+  const showSnackbar = (message, severity) => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setOpenSnackbar(true);
+  };
+
   return (
-    <Container maxWidth="sm" sx={{ padding: isMobile ? '20px' : '40px', textAlign: 'center' }}>
-      <Typography variant={isMobile ? 'h6' : 'h5'} gutterBottom>
-        Note Link Ready
-      </Typography>
+    <Container maxWidth="md">
+    <Paper 
+      elevation={3}
+      sx={{
+        p: { xs: 2, sm: 4 },
+        borderRadius: 2,
+        background: 'linear-gradient(145deg, #ffffff, #f5f5f5)',
+      }}
+    >
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <Typography 
+          variant={isMobile ? 'h5' : 'h4'} 
+          component="h1" 
+          gutterBottom 
+          color="primary"
+          sx={{ fontWeight: 'bold' }}
+        >
+          {t('note_ready_title')}
+        </Typography>
+        <Typography variant="body1" color="text.secondary" gutterBottom>
+          {t('note_ready_description')}
+        </Typography>
+      </Box>
 
-      <TextField
-        fullWidth
-        value={noteLink}
-        sx={{
-          readOnly: true,
-          backgroundColor: '#ffffcc',
-          marginBottom: '16px',
-        }}
-        variant="outlined"
-      />
+      <Box sx={{ mb: 4 }}>
+        <TextField
+          fullWidth
+          value={noteLink}
+          InputProps={{
+            readOnly: true,
+            endAdornment: (
+              <Tooltip title={t('copy_link')}>
+                <IconButton onClick={handleCopyLink} size="large">
+                  <ContentCopyIcon />
+                </IconButton>
+              </Tooltip>
+            ),
+          }}
+          sx={{
+            backgroundColor: 'rgba(255, 255, 204, 0.3)',
+            '& .MuiOutlinedInput-root': {
+              '&:hover fieldset': {
+                borderColor: theme.palette.primary.main,
+              },
+            },
+          }}
+        />
+      </Box>
 
-      <Typography variant="body2" sx={{ marginBottom: '16px' }}>
-        The note will self-destruct after reading it.
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
+        <Box sx={{ 
+          p: 2, 
+          backgroundColor: 'white', 
+          borderRadius: 2,
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+        }}>
+          <QRCodeSVG 
+            value={noteLink} 
+            size={128} 
+            level="H"
+            includeMargin={true}
+          />
+        </Box>
+      </Box>
 
       <Box
         sx={{
-          display: 'flex',
-          flexDirection: isMobile ? 'column' : 'row',
-          justifyContent: isMobile ? 'center' : 'space-between',
-          gap: '10px',
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+          gap: 2,
         }}
       >
         <Button
           variant="contained"
           color="primary"
-          onClick={handleCopyLink}
-          sx={{
-            flex: isMobile ? '1 0 auto' : '1',
-          }}
+          startIcon={<EmailIcon />}
+          href={`mailto:?subject=${encodeURIComponent(t('email_subject'))}&body=${encodeURIComponent(t('email_body', { link: noteLink }))}`}
+          fullWidth
         >
-          Copy Link
+          {t('email_link')}
         </Button>
-        <Button
-          variant="contained"
-          color="secondary"
-          href={`mailto:?subject=Secure Note Link&body=Here is the link to your secure note: ${noteLink}`}
-          sx={{
-            flex: isMobile ? '1 0 auto' : '1',
-          }}
-        >
-          Email Link
-        </Button>
-      </Box>
 
-      {copySuccess && (
-        <Typography variant="body2" color="secondary" sx={{ marginTop: '12px' }}>
-          {copySuccess}
-        </Typography>
-      )}
-
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: isMobile ? 'column' : 'row',
-          justifyContent: isMobile ? 'center' : 'space-between',
-          gap: '10px',
-          marginTop: '20px',
-        }}
-      >
         <Button
           variant="contained"
           color="error"
+          startIcon={<DeleteIcon />}
           onClick={handleDestroy}
-          sx={{
-            flex: isMobile ? '1 0 auto' : '1',
-          }}
+          disabled={isDestroying}
+          fullWidth
         >
-          Destroy Note Now
+          {isDestroying ? t('destroying_note') : t('destroy_note')}
         </Button>
+
         <Button
-          variant="contained"
+          variant="outlined"
+          color="primary"
+          startIcon={<HomeIcon />}
           onClick={() => navigate('/')}
-          sx={{
-            flex: isMobile ? '1 0 auto' : '1',
-          }}
+          fullWidth
+          sx={{ gridColumn: { xs: '1', sm: '1 / -1' } }}
         >
-          Go to Home
+          {t('go_to_home')}
         </Button>
       </Box>
 
-      {destroyMessage && (
-        <Typography variant="h6" color="error" sx={{ marginTop: '20px' }}>
-          {destroyMessage}
-        </Typography>
-      )}
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={4000}
+        onClose={() => setOpenSnackbar(false)}
+      >
+        <Alert 
+          onClose={() => setOpenSnackbar(false)} 
+          severity={snackbarSeverity}
+          sx={{ width: '100%' }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
+    </Paper>
     </Container>
   );
 }

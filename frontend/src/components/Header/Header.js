@@ -1,106 +1,156 @@
 import React from 'react';
-import { Typography, Button, Box, MenuItem, Select  } from '@mui/material';
-import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
-import { useTheme } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  Box,
+  IconButton,
+  Menu,
+  MenuItem,
+  useTheme,
+  useMediaQuery,
+  Tooltip,
+} from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import LanguageIcon from '@mui/icons-material/Language';
+import HomeIcon from '@mui/icons-material/Home';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 function Header() {
-    const navigate = useNavigate();
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // Breakpoint for small screens
+  const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [anchorEl, setAnchorEl] = React.useState(null);
 
+  const handleLanguageMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
 
-    const { t, i18n } = useTranslation(); // Initialize translation hook
+  const handleLanguageMenuClose = () => {
+    setAnchorEl(null);
+  };
 
-    const handleLanguageChange = (event) => {
-        const selectedLanguage = event.target.value;
-        i18n.changeLanguage(selectedLanguage); // Change the language
-    };
+  const handleLanguageChange = (language) => {
+    i18n.changeLanguage(language);
+    handleLanguageMenuClose();
+  };
 
+  const handleLogout = () => {
+    localStorage.removeItem('auth_token');
+    navigate('/login');
+  };
 
-    // Handle clicking on the title (navigates to homepage)
-    const handleClick = () => {
-        localStorage.getItem('token') ? navigate('/') : navigate('/login') ;
-    };
+  return (
+    <AppBar position="static" color="default" elevation={1}>
+      <Toolbar>
+        <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
+          <Typography
+            variant={isMobile ? 'h6' : 'h5'}
+            component="div"
+            sx={{
+              fontWeight: 'bold',
+              color: 'primary.main',
+              cursor: 'pointer',
+              '&:hover': {
+                opacity: 0.8,
+              },
+            }}
+            onClick={() => navigate('/')}
+          >
+            {t('app_title')}
+          </Typography>
+        </Box>
 
-    // Handle logout functionality
-    const handleLogout = () => {
-        // Remove JWT token from localStorage
-        localStorage.removeItem('token');
-
-        // Redirect user to login page
-        navigate('/login');
-    };
-
-    return (
-        <header>
-            <Box
-                display="flex"
-                // flexDirection={isMobile ? 'column' : 'row'}
-                justifyContent='center'
-                alignItems="center"
-                padding={isMobile ? '10px 5px' : '10px'}
-                // bgcolor="#f5f5f5"
-                borderBottom="1px solid #ddd"
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Tooltip title={t('home')} placement='auto'>
+            <IconButton
+              onClick={() => navigate('/')}
+              color="primary"
+              aria-label={t('home')}
+              sx={{
+                display: { xs: 'flex', sm: 'none' },
+                '&:hover': {
+                  backgroundColor: 'primary.light',
+                  color: 'white',
+                },
+              }}
             >
-                {/* Empty Box to push the title to the center */}
-                <Box flex={1}>
-                    <Select
-                        value={i18n.language} // Current language
-                        onChange={handleLanguageChange}
-                        variant="outlined"
-                        size={isMobile ? "small" : "medium"} 
-                        sx={{
-                            '& .MuiSelect-select': {
-                              padding: '5px 10px', // Adjust padding here
-                            },
-                          }}                       
-                    >
-                        <MenuItem value="en">EN</MenuItem>
-                        <MenuItem value="fr">FR</MenuItem>
-                        <MenuItem value="telugu">Telugu</MenuItem>
-                    </Select>
-                </Box>
-                {/* Clicking the title navigates to the homepage */}
-                <Box 
-                    onClick={handleClick}
-                    sx={{
-                        cursor: 'pointer',
-                        textAlign: 'center',
-                        marginBottom: isMobile ? '10px' : '0',
-                    }}
-                >
-                    <Typography variant={isMobile ? 'h5' : 'h4'} style={{ fontWeight: 'bold' }}>
-                        crypto<span style={{ color: 'red' }}>Note</span>
-                    </Typography>
-                    <Typography
-                        variant={isMobile ? 'body2' : 'body1'}
-                        color="gray"
-                        style={{ fontSize: isMobile ? '0.8rem' : 'inherit' }}
-                    >
-                        A place to share your note securely
-                    </Typography>
-                </Box>
+              <HomeIcon />
+            </IconButton>
+          </Tooltip>
 
-                {/* Logout Button (conditionally displayed if the token is in localStorage) */}
-                <Box flex={1} display="flex" justifyContent="flex-end">
-                    {localStorage.getItem('token') && (                    
-                        <Button
-                            variant="contained"
-                            // size='small'
-                            color="error"
-                            onClick={handleLogout}
-                            sx={{ fontSize: isMobile ? '0.6rem' : 'inherit', minWidth:0, height: {xs:"20px", md:"35px"}, width: {xs:"10px", md:"100px"} }}
-                        >
-                            <LogoutIcon fontSize="small"/> {!isMobile ? "Logout":""}
-                        </Button>                    
-                    )}
-                </Box>
-            </Box>
-        </header>
-    );
+          <Button
+            startIcon={<HomeIcon />}
+            onClick={() => navigate('/')}
+            color="primary"
+            sx={{
+              display: { xs: 'none', sm: 'flex' },
+              '&:hover': {
+                backgroundColor: 'primary.light',
+                color: 'white',
+              },
+            }}
+          >
+            {t('home')}
+          </Button>
+
+          {localStorage.getItem('auth_token') && (
+            <Tooltip title={t('logout')} placement='auto'>
+              <Button
+                variant="contained"
+                color="error"
+                onClick={handleLogout}
+                startIcon={<LogoutIcon />}
+                aria-label={t('logout')}
+                sx={{
+                  '&:hover': {
+                    backgroundColor: 'error.dark',
+                  },
+                }}
+              >
+                {!isMobile && t('logout')}
+              </Button>
+            </Tooltip>
+          )}
+
+          <Tooltip title={t('change_language')} placement='auto'>
+            <IconButton
+              color="primary"
+              onClick={handleLanguageMenuOpen}
+              aria-label={t('change_language')}
+              sx={{
+                '&:hover': {
+                  backgroundColor: 'primary.light',
+                  color: 'white',
+                },
+              }}
+            >
+              <LanguageIcon />
+            </IconButton>
+          </Tooltip>
+
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleLanguageMenuClose}
+          >
+            <MenuItem onClick={() => handleLanguageChange('en')}>
+              {t('language_english')}
+            </MenuItem>
+            <MenuItem onClick={() => handleLanguageChange('fr')}>
+              {t('language_french')}
+            </MenuItem>
+            <MenuItem onClick={() => handleLanguageChange('telugu')}>
+              {t('language_telugu')}
+            </MenuItem>
+          </Menu>
+        </Box>
+      </Toolbar>
+    </AppBar>
+  );
 }
 
 export default Header;

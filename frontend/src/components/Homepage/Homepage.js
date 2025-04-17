@@ -1,12 +1,15 @@
 import React from 'react';
-import { Container, Typography, Box, Button, Grid } from '@mui/material';
+import { Container, Typography, Box, Button, Grid, Paper, useTheme } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import NoteAddIcon from '@mui/icons-material/NoteAdd';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import './Homepage.css';
 
 const Homepage = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const theme = useTheme();
 
   // Handlers to navigate to different pages
   const handleCreateNote = () => {
@@ -18,85 +21,110 @@ const Homepage = () => {
   };
 
   return (
-    <Container maxWidth="md" sx={{p:0}}>
-      <Box 
-      minHeight={"50vh"}
-        className="box" 
-        display="flex" 
-        flexDirection="column" 
-        alignItems="center" 
-        justifyContent="center" 
-        textAlign="center"
-        p={0}
+    <Container maxWidth="md">
+      <Paper 
+        elevation={3}
+        sx={{
+          p: 4,
+          mt: 4,
+          borderRadius: 2,
+          background: 'linear-gradient(145deg, #ffffff, #f5f5f5)',
+          minHeight: '60vh',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+        }}
       >
-        {/* Welcome Header */}
-        <Typography
-          variant="h3"
-          className="welcome-text"
-          sx={{
-            fontSize: {
-              xs: '1.5rem', // Font size for mobile devices (xs: extra small)
-              sm: '2rem',   // Font size for small devices
-              md: '3rem',   // Font size for medium and above
-            },
-            fontWeight:'bold'            
-          }}
-          gutterBottom
+        <Box 
+          display="flex" 
+          flexDirection="column" 
+          alignItems="center" 
+          justifyContent="center" 
+          textAlign="center"
         >
-          {t('welcome_message')}
-        </Typography>
-        <Typography variant="h6" sx={{
-            fontSize: {
-              xs: '0.9rem', // Font size for mobile devices (xs: extra small)
-              sm: '1rem',   // Font size for small devices
-              md: '1.5rem',   // Font size for medium and above
-            },           
-          }}
-          gutterBottom>
-          {t('description')}
-        </Typography>
+          {/* Welcome Header */}
+          <Typography
+            variant="h3"
+            sx={{
+              fontSize: {
+                xs: '1.8rem',
+                sm: '2.2rem',
+                md: '3rem',
+              },
+              fontWeight: 'bold',
+              color: theme.palette.primary.main,
+              mb: 2,
+            }}
+          >
+            {t('welcome_message')}
+          </Typography>
+          
+          <Typography 
+            variant="h6" 
+            sx={{
+              fontSize: {
+                xs: '1rem',
+                sm: '1.1rem',
+                md: '1.5rem',
+              },
+              color: theme.palette.text.secondary,
+              mb: 4,
+              maxWidth: '600px',
+            }}
+          >
+            {t('description')}
+          </Typography>
 
-        <Grid container spacing={2} justifyContent="center" mt={4}>
-          <Grid item xs={12} sm={6}>
-            {/* Create Note Button */}
-            <Button
-              variant="contained"
-              color="primary"
-              size="large"
-              fullWidth
-              className="create-button"
-              onClick={handleCreateNote}
-              sx={{
-                fontSize:{
-                  xs:'0.8rem',
-                  md:'1rem'
-                }
-              }}
-            >
-              {t('create_note')}
-            </Button>
+          <Grid container spacing={3} justifyContent="center" mt={2}>
+            <Grid item xs={12} sm={6}>
+              <Button
+                variant="contained"
+                color="primary"
+                size="large"
+                fullWidth
+                startIcon={<NoteAddIcon />}
+                onClick={handleCreateNote}
+                sx={{
+                  py: 2,
+                  fontSize: {
+                    xs: '0.9rem',
+                    md: '1.1rem'
+                  },
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    transition: 'transform 0.2s',
+                  }
+                }}
+              >
+                {t('create_note')}
+              </Button>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Button
+                variant="contained"
+                color="secondary"
+                size="large"
+                fullWidth
+                startIcon={<VisibilityIcon />}
+                onClick={handleViewNote}
+                sx={{
+                  py: 2,
+                  fontSize: {
+                    xs: '0.9rem',
+                    md: '1.1rem'
+                  },
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    transition: 'transform 0.2s',
+                  }
+                }}
+              >
+                {t('view_note')}
+              </Button>
+            </Grid>
           </Grid>
-          <Grid item xs={12} sm={6}>
-            {/* View Note Button */}
-            <Button
-              variant="contained"
-              color="primary"
-              size="large"
-              fullWidth
-              className="view-button"
-              onClick={handleViewNote}
-              sx={{
-                fontSize:{
-                  xs:'0.8rem',
-                  md:'1rem'
-                }
-              }}
-            >
-              {t('view_note')}
-            </Button>
-          </Grid>
-        </Grid>
-      </Box>
+        </Box>
+      </Paper>
     </Container>
   );
 };

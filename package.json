@@ -1,5 +1,5 @@
 {
-  "name": "comp5130",
+  "name": "cryptonote",
   "dependencies": {},
   "devDependencies": {
     "concurrently": "^7.0.0"

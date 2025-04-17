@@ -1,45 +1,65 @@
 .new-note-container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-    border-radius: 8px;
-    background-color: #f9f9f9;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #ffffff, #f5f5f5);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.form-section {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.options-section {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease-in-out;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+/* Button styles */
+button {
+  transition: all 0.3s ease;
+  text-transform: none;
+  font-weight: 500;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Input styles */
+input, textarea, select {
+  transition: all 0.3s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .new-note-container {
+    padding: 1rem;
+    margin: 0.5rem;
   }
   
-  header {
-    text-align: center;
-    margin-bottom: 20px;
+  .form-section, .options-section {
+    padding: 1rem;
   }
-  
-  header h1 {
-    margin: 0;
-    font-size: 24px;
-    color: #333;
-  }
-  
-  header p {
-    margin: 0;
-    font-size: 14px;
-    color: #777;
-  }
-  
-  .options-section {
-    margin-top: 20px;
-  }
-  
-  button {
-    display: inline-block;
-    padding: 10px 20px;
-    margin-right: 10px;
-    border: none;
-    border-radius: 4px;
-    background-color: #007bff;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-  }
-  
-  button:hover {
-    opacity: 0.9;
-  }
+}
   

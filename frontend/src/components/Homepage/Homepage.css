@@ -1,3 +1,50 @@
+/* Add smooth transitions */
+* {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Container styles */
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Welcome text animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.welcome-text {
+  animation: fadeIn 0.8s ease-out;
+}
+
+/* Button hover effects */
+.create-button:hover,
+.view-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .welcome-text {
+    font-size: 1.5rem;
+  }
+}
+
 .box {
   text-align: center;
   margin-top: 3rem;
